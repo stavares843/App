@@ -37,11 +37,6 @@ jobs:
           path: .jest-cache
           key: ${{ runner.os }}-jest
 
-      - name: All Unit Tests
-        if: ${{ fromJSON(matrix.chunk) < fromJSON(env.CHUNKS) }}
-        # Split the jest based test files in multiple chunks/groups and then execute them in parallel in different jobs/runners.
-        run: npx jest --listTests --json | jq -cM '[_nwise(length / ${{ fromJSON(needs.config.outputs.JEST_CHUNKS) }} | ceil)]' | jq '[[]] + .' | jq '.[${{ fromJSON(matrix.chunk) }}] | .[] | @text' | xargs npm test
-
       - name: Pull Request Tests
         # Pull request related tests will be run in separate runner in parallel.
         if: ${{ fromJSON(matrix.chunk) == fromJSON(env.CHUNKS) }}
